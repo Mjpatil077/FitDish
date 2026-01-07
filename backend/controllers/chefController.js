@@ -1,4 +1,17 @@
-const User = require('../models/User');
+const chefs = [
+  {
+    _id: "c1",
+    name: "Chef Riddhi",
+    bio: "Healthy Indian cooking expert",
+    cuisineSpecialties: ["Gujarati", "Indian"],
+    rating: 4.9,
+    totalReviews: 120,
+    experience: 8,
+    isVerified: true,
+    avatar: "https://i.pravatar.cc/150?img=10"
+  }
+];
+
 const Session = require('../models/Session');
 const Review = require('../models/Review');
 
@@ -6,22 +19,13 @@ const Review = require('../models/Review');
 // @route   GET /api/chefs
 // @access  Public
 exports.getAllChefs = async (req, res) => {
-  try {
-    const chefs = await User.find({ role: 'chef' })
-      .select('name email bio cuisineSpecialties rating totalReviews avatar isVerified experience');
-    
-    res.status(200).json({
-      success: true,
-      count: chefs.length,
-      chefs
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
+  res.json({
+    success: true,
+    count: chefs.length,
+    chefs
+  });
 };
+
 
 // @desc    Get chef profile
 // @route   GET /api/chefs/:id
