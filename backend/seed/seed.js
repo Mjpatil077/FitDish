@@ -7,6 +7,7 @@ dotenv.config();
 const User = require('../models/User');
 const Category = require('../models/Category');
 const Video = require('../models/Video');
+const Course = require('../models/Course');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fitdish';
 
@@ -391,12 +392,83 @@ const seedData = async () => {
     const createdVideos = await Video.insertMany(videos);
     console.log(`✅ Created ${createdVideos.length} videos`);
 
+    // Create Courses
+    const courses = [
+      {
+        title: 'Complete Kashmiri Home Cooking',
+        chef: createdChefs[0]._id,
+        category: createdCategories.find(c => c.slug === 'kashmiri')._id,
+        categorySlug: 'kashmiri',
+        description: 'Master authentic Kashmiri cuisine with this comprehensive course. Learn traditional recipes, cooking techniques, and how to make healthy versions of classic dishes.',
+        difficulty: 'intermediate',
+        duration: 120,
+        price: 999,
+        videos: [
+          createdVideos[0]._id, // Kashmiri Dum Aloo
+          createdVideos[9]._id  // Rajasthani Dal Baati (as example)
+        ],
+        thumbnail: 'https://source.unsplash.com/featured/?kashmiri-food',
+        isPublished: true
+      },
+      {
+        title: 'Healthy Punjabi Cooking Masterclass',
+        chef: createdChefs[1]._id,
+        category: createdCategories.find(c => c.slug === 'punjabi')._id,
+        categorySlug: 'punjabi',
+        description: 'Learn to cook delicious Punjabi meals that are both authentic and healthy. Perfect for fitness enthusiasts who love North Indian food.',
+        difficulty: 'beginner',
+        duration: 90,
+        price: 799,
+        videos: [
+          createdVideos[1]._id, // Healthy Punjabi Dinner
+          createdVideos[7]._id  // Street Food Pav Bhaji
+        ],
+        thumbnail: 'https://source.unsplash.com/featured/?punjabi-food',
+        isPublished: true
+      },
+      {
+        title: 'Mediterranean & Italian Healthy Meals',
+        chef: createdChefs[4]._id,
+        category: createdCategories.find(c => c.slug === 'italian')._id,
+        categorySlug: 'italian',
+        description: 'Discover the secrets of healthy Mediterranean and Italian cooking. Learn to create nutritious, flavorful dishes that support your fitness goals.',
+        difficulty: 'beginner',
+        duration: 75,
+        price: 899,
+        videos: [
+          createdVideos[3]._id, // Italian Pasta
+          createdVideos[8]._id  // Mediterranean Quinoa Bowl
+        ],
+        thumbnail: 'https://source.unsplash.com/featured/?mediterranean-food',
+        isPublished: true
+      },
+      {
+        title: 'Japanese Meal Prep Essentials',
+        chef: createdChefs[5]._id,
+        category: createdCategories.find(c => c.slug === 'japanese')._id,
+        categorySlug: 'japanese',
+        description: 'Master Japanese cooking techniques and learn to prepare healthy bento boxes for meal prep. Perfect for busy professionals.',
+        difficulty: 'intermediate',
+        duration: 100,
+        price: 1199,
+        videos: [
+          createdVideos[4]._id  // Japanese Bento Basics
+        ],
+        thumbnail: 'https://source.unsplash.com/featured/?japanese-food',
+        isPublished: true
+      }
+    ];
+
+    const createdCourses = await Course.insertMany(courses);
+    console.log(`✅ Created ${createdCourses.length} courses`);
+
     console.log('\n🎉 Seeding completed successfully!');
     console.log('\n📊 Summary:');
     console.log(`   - Users: 1 (demo user)`);
     console.log(`   - Chefs: ${createdChefs.length}`);
     console.log(`   - Categories: ${createdCategories.length}`);
     console.log(`   - Videos: ${createdVideos.length}`);
+    console.log(`   - Courses: ${createdCourses.length}`);
     console.log('\n🔑 Demo Credentials:');
     console.log('   Email: demo@fitdish.com');
     console.log('   Password: password123');

@@ -1,6 +1,27 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// Protect routes (optional - sets req.user if token exists)
+exports.optionalAuth = async (req, res, next) => {
+  let token;
+
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key');
+      req.user = await User.findById(decoded.id);
+    } catch (error) {
+      // Invalid token, continue without user
+      req.user = null;
+    }
+  }
+
+  next();
+};
+
 // Protect routes
 exports.protect = async (req, res, next) => {
   let token;

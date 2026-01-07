@@ -121,8 +121,8 @@ const Navbar = () => {
             <Link to="/chefs" className="text-gray-700 hover:text-primary-600 transition-colors">
               Chefs
             </Link>
-            <Link to="/videos" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Videos
+            <Link to="/courses" className="text-gray-700 hover:text-primary-600 transition-colors">
+              Courses
             </Link>
           </div>
 
@@ -130,13 +130,23 @@ const Navbar = () => {
             {user ? (
               <>
                 {user.role === 'chef' ? (
-                  <Link to="/chef/dashboard" className="btn btn-outline text-sm">
-                    Chef Dashboard
-                  </Link>
+                  <>
+                    <Link to="/chef/dashboard" className="btn btn-outline text-sm">
+                      Chef Dashboard
+                    </Link>
+                    <Link to="/chef/courses" className="text-gray-700 hover:text-primary-600 transition-colors text-sm">
+                      My Courses
+                    </Link>
+                  </>
                 ) : (
-                  <Link to="/dashboard" className="btn btn-outline text-sm">
-                    Dashboard
-                  </Link>
+                  <>
+                    <Link to="/dashboard" className="btn btn-outline text-sm">
+                      Dashboard
+                    </Link>
+                    <Link to="/my-courses" className="text-gray-700 hover:text-primary-600 transition-colors text-sm">
+                      My Courses
+                    </Link>
+                  </>
                 )}
                 <button
                   onClick={handleLogout}

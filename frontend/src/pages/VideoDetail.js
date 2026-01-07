@@ -1,22 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FiClock, FiUsers, FiStar, FiCheckCircle } from 'react-icons/fi';
+import AuthContext from '../context/AuthContext';
+import LoginModal from '../components/LoginModal';
+import { FiClock, FiUsers, FiStar, FiCheckCircle, FiLock } from 'react-icons/fi';
 
 const VideoDetail = () => {
   const { id } = useParams();
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [video, setVideo] = useState(null);
   const [relatedVideos, setRelatedVideos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     fetchVideoData();
   }, [id]);
 
+  // Track watch progress
+  useEffect(() => {
+    if (video && user) {
+      const trackProgress = () => {
+        const interval = setInterval(() => {
+          axios.post('/api/watch-history', {
+            videoId: video._id,
+            progress: 50
+          }).catch(err => console.error('Error tracking progress:', err));
+        }, 30000);
+
+        return () => clearInterval(interval);
+      };
+
+      const cleanup = trackProgress();
+      return cleanup;
+    }
+  }, [video, user]);
+
   const fetchVideoData = async () => {
     try {
       const videoRes = await axios.get(`/api/videos/${id}`);
       setVideo(videoRes.data.video);
+      
+      // If not logged in, show login modal
+      if (!user) {
+        setShowLoginModal(true);
+      }
 
       // Fetch related videos
       if (videoRes.data.video.category && videoRes.data.video.category.slug) {
@@ -28,15 +57,25 @@ const VideoDetail = () => {
         );
       }
     } catch (error) {
+      if (error.response?.status === 403) {
+        setShowLoginModal(true);
+      }
       console.error('Error fetching video:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleVideoClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      setShowLoginModal(true);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="section-padding">
+      <div className="section-padding bg-secondary-50 min-h-screen">
         <div className="container-custom text-center">
           <div className="text-primary-600 text-lg">Loading video...</div>
         </div>
@@ -46,7 +85,7 @@ const VideoDetail = () => {
 
   if (!video) {
     return (
-      <div className="section-padding">
+      <div className="section-padding bg-secondary-50 min-h-screen">
         <div className="container-custom text-center">
           <p className="text-gray-600 text-lg">Video not found</p>
         </div>
@@ -56,19 +95,37 @@ const VideoDetail = () => {
 
   return (
     <div className="section-padding bg-secondary-50 min-h-screen">
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      
       <div className="container-custom max-w-6xl">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Video */}
           <div className="lg:col-span-2">
             <div className="card mb-6">
-              <div className="aspect-video bg-gray-200 rounded-xl mb-6 overflow-hidden">
-                <iframe
-                  src={video.youtubeEmbedUrl}
-                  title={video.title}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+              <div className="aspect-video bg-gray-900 rounded-xl mb-6 overflow-hidden relative">
+                {user ? (
+                  <iframe
+                    src={video.youtubeEmbedUrl}
+                    title={video.title}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-white p-8">
+                    <FiLock className="text-6xl mb-4 opacity-50" />
+                    <h3 className="text-2xl font-bold mb-2">Login to Watch</h3>
+                    <p className="text-gray-300 text-center mb-6 max-w-md">
+                      Login to watch this video and personalize your FitDish journey
+                    </p>
+                    <button
+                      onClick={() => setShowLoginModal(true)}
+                      className="btn bg-white text-primary-700 hover:bg-gray-100 px-8 py-3 font-semibold"
+                    >
+                      Login to Watch
+                    </button>
+                  </div>
+                )}
               </div>
               
               <h1 className="text-3xl font-display font-bold text-primary-800 mb-4">
@@ -111,7 +168,7 @@ const VideoDetail = () => {
             {video.chef && (
               <div className="card">
                 <div className="flex items-start space-x-4">
-                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {video.chef.avatar ? (
                       <img src={video.chef.avatar} alt={video.chef.name} className="w-16 h-16 rounded-full object-cover" />
                     ) : (
@@ -159,19 +216,25 @@ const VideoDetail = () => {
             ) : (
               <div className="space-y-4">
                 {relatedVideos.map((relatedVideo) => (
-                  <Link
+                  <div
                     key={relatedVideo._id}
-                    to={`/videos/${relatedVideo._id}`}
-                    className="card hover:scale-[1.02] transition-transform block"
+                    onClick={handleVideoClick}
+                    className="card hover:scale-[1.02] transition-transform cursor-pointer"
                   >
-                    <div className="aspect-video bg-gray-200 rounded-xl mb-3 overflow-hidden">
-                      <iframe
-                        src={relatedVideo.youtubeEmbedUrl}
-                        title={relatedVideo.title}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+                    <div className="aspect-video bg-gray-200 rounded-xl mb-3 overflow-hidden relative">
+                      {user ? (
+                        <iframe
+                          src={relatedVideo.youtubeEmbedUrl}
+                          title={relatedVideo.title}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                          <FiLock className="text-white text-2xl opacity-50" />
+                        </div>
+                      )}
                     </div>
                     <h4 className="text-sm font-semibold text-primary-800 line-clamp-2 mb-2">
                       {relatedVideo.title}
@@ -183,7 +246,7 @@ const VideoDetail = () => {
                         <span>{relatedVideo.duration} min</span>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
@@ -195,4 +258,3 @@ const VideoDetail = () => {
 };
 
 export default VideoDetail;
-

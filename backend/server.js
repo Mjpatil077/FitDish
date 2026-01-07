@@ -21,6 +21,9 @@ app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/recipes', require('./routes/recipes'));
 app.use('/api/categories', require('./routes/categories'));
 app.use('/api/videos', require('./routes/videos'));
+app.use('/api/watch-history', require('./routes/watchHistory'));
+app.use('/api/courses', require('./routes/courses'));
+app.use('/api/analytics', require('./routes/analytics'));
 
 // Health check
 app.get('/api/health', (req, res) => {

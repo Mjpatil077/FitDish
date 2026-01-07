@@ -2,13 +2,17 @@ const Video = require('../models/Video');
 
 // @desc    Get all videos
 // @route   GET /api/videos
-// @access  Public
+// @access  Public (limited for non-logged-in users)
 exports.getAllVideos = async (req, res) => {
   try {
     const { category, chefId, isFree } = req.query;
     let query = {};
 
-    if (isFree === 'true') {
+    // For non-logged-in users, only show free videos (limit to 5)
+    // For logged-in users, show all videos
+    if (!req.user) {
+      query.isFree = true;
+    } else if (isFree === 'true') {
       query.isFree = true;
     }
 
@@ -30,15 +34,21 @@ exports.getAllVideos = async (req, res) => {
       query.chef = chefId;
     }
 
-    const videos = await Video.find(query)
+    let videos = await Video.find(query)
       .populate('chef', 'name avatar rating')
       .populate('category', 'name type slug imageUrl')
       .sort('-createdAt');
 
+    // Limit free videos for non-logged-in users
+    if (!req.user && videos.length > 5) {
+      videos = videos.slice(0, 5);
+    }
+
     res.status(200).json({
       success: true,
       count: videos.length,
-      videos
+      videos,
+      isLimited: !req.user && videos.length >= 5
     });
   } catch (error) {
     res.status(500).json({
@@ -95,7 +105,43 @@ exports.getVideosByCategory = async (req, res) => {
       });
     }
 
-    const videos = await Video.find({ category: category._id })
+    let query = { category: category._id };
+    
+    // For non-logged-in users, only show free videos
+    if (!req.user) {
+      query.isFree = true;
+    }
+
+    let videos = await Video.find(query)
+      .populate('chef', 'name avatar rating')
+      .populate('category', 'name type slug imageUrl')
+      .sort('-createdAt');
+
+    // Limit free videos for non-logged-in users
+    if (!req.user && videos.length > 5) {
+      videos = videos.slice(0, 5);
+    }
+
+    res.status(200).json({
+      success: true,
+      count: videos.length,
+      videos,
+      isLimited: !req.user && videos.length >= 5
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Get my videos (for chef)
+// @route   GET /api/videos/chef/me
+// @access  Private (Chef)
+exports.getMyVideos = async (req, res) => {
+  try {
+    const videos = await Video.find({ chef: req.user.id })
       .populate('chef', 'name avatar rating')
       .populate('category', 'name type slug imageUrl')
       .sort('-createdAt');

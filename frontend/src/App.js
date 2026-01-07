@@ -13,6 +13,9 @@ import About from './pages/About';
 import VideosPage from './pages/VideosPage';
 import VideoDetail from './pages/VideoDetail';
 import CategoryPage from './pages/CategoryPage';
+import CategoriesPage from './pages/CategoriesPage';
+import CoursesPage from './pages/CoursesPage';
+import CourseDetail from './pages/CourseDetail';
 
 // Protected Routes
 import PrivateRoute from './components/PrivateRoute';
@@ -21,6 +24,8 @@ import UserBookings from './pages/user/UserBookings';
 import SavedRecipes from './pages/user/SavedRecipes';
 import UserProfile from './pages/user/UserProfile';
 import BookSession from './pages/user/BookSession';
+import MyCourses from './pages/user/MyCourses';
+import WatchHistory from './pages/user/WatchHistory';
 
 // Chef Routes
 import ChefDashboard from './pages/chef/ChefDashboard';
@@ -50,11 +55,16 @@ function App() {
               <Route path="/chefs/:id" element={<ChefProfile />} />
               <Route path="/videos" element={<VideosPage />} />
               <Route path="/videos/:id" element={<VideoDetail />} />
+              <Route path="/courses" element={<CoursesPage />} />
+              <Route path="/courses/:id" element={<CourseDetail />} />
+              <Route path="/categories" element={<CategoriesPage />} />
               <Route path="/category/:slug" element={<CategoryPage />} />
               <Route path="/about" element={<About />} />
 
               {/* User Protected Routes */}
               <Route path="/dashboard" element={<PrivateRoute><UserDashboard /></PrivateRoute>} />
+              <Route path="/my-courses" element={<PrivateRoute><MyCourses /></PrivateRoute>} />
+              <Route path="/watch-history" element={<PrivateRoute><WatchHistory /></PrivateRoute>} />
               <Route path="/bookings" element={<PrivateRoute><UserBookings /></PrivateRoute>} />
               <Route path="/saved" element={<PrivateRoute><SavedRecipes /></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />

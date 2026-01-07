@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { FiClock, FiUsers, FiStar, FiCheckCircle, FiAward } from 'react-icons/fi';
+import AuthContext from '../context/AuthContext';
+import LoginModal from '../components/LoginModal';
+import { FiClock, FiUsers, FiStar, FiCheckCircle, FiAward, FiLock } from 'react-icons/fi';
 
 const CategoryPage = () => {
   const { slug } = useParams();
+  const { user } = useContext(AuthContext);
   const [category, setCategory] = useState(null);
   const [videos, setVideos] = useState([]);
   const [chefs, setChefs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     fetchCategoryData();
@@ -69,6 +73,7 @@ const CategoryPage = () => {
 
   return (
     <div className="bg-secondary-50 min-h-screen">
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary-50 to-secondary-100">
         <div className="container-custom">
@@ -193,24 +198,42 @@ const CategoryPage = () => {
           {/* Videos Section */}
           {videos.length > 0 && (
             <div className="mb-12">
-              <h2 className="text-3xl font-display font-bold text-primary-800 mb-6">
-                Free Video Tutorials
-              </h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-3xl font-display font-bold text-primary-800">
+                  Video Tutorials
+                </h2>
+                {!user && (
+                  <p className="text-sm text-gray-600">
+                    Login to watch videos
+                  </p>
+                )}
+              </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {videos.map((video) => (
-                  <Link
+                  <div
                     key={video._id}
-                    to={`/videos/${video._id}`}
-                    className="card hover:scale-[1.02] transition-transform"
+                    onClick={() => {
+                      if (!user) {
+                        setShowLoginModal(true);
+                      }
+                    }}
+                    className={`card hover:scale-[1.02] transition-transform ${!user ? 'cursor-pointer' : ''}`}
                   >
-                    <div className="aspect-video bg-gray-200 rounded-xl mb-4 relative overflow-hidden">
-                      <iframe
-                        src={video.youtubeEmbedUrl}
-                        title={video.title}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+                    <div className="aspect-video bg-gray-900 rounded-xl mb-4 relative overflow-hidden">
+                      {user ? (
+                        <iframe
+                          src={video.youtubeEmbedUrl}
+                          title={video.title}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-white p-4">
+                          <FiLock className="text-4xl mb-2 opacity-50" />
+                          <span className="text-sm font-medium">Login to Watch</span>
+                        </div>
+                      )}
                     </div>
                     <h3 className="text-lg font-display font-semibold mb-2 text-primary-800 line-clamp-2">
                       {video.title}
@@ -235,7 +258,15 @@ const CategoryPage = () => {
                         </div>
                       </div>
                     </div>
-                  </Link>
+                    {user && (
+                      <Link
+                        to={`/videos/${video._id}`}
+                        className="block mt-3 text-primary-600 hover:text-primary-700 font-medium text-sm"
+                      >
+                        Watch Now →
+                      </Link>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
