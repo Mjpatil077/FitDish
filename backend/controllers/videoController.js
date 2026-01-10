@@ -358,7 +358,7 @@ const videos = [
     },
     chef: {
       _id: "c9",
-      name: "Chef Sanjyot Keer"
+      name: "Chef Sanjeev Kapoor"
     }
   },
   // ================= Mediterranean =================

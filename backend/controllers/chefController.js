@@ -9,6 +9,50 @@ const chefs = [
     experience: 8,
     isVerified: true,
     avatar: "https://i.pravatar.cc/150?img=10"
+  },
+  {
+    _id: "c2",
+    name: "Chef Sanjyot Keer",
+    bio: "Healthy Indian cooking expert",
+    cuisineSpecialties: ["Gujarati", "Indian"],
+    rating: 4.9,
+    totalReviews: 120,
+    experience: 8,
+    isVerified: true,
+    avatar: "https://i.pravatar.cc/150?img=10"
+  },
+  {
+    _id: "c3",
+    name: "Chef Kunal Kapur",
+    bio: "Healthy Indian cooking expert",
+    cuisineSpecialties: ["Gujarati", "Indian"],
+    rating: 4.9,
+    totalReviews: 120,
+    experience: 8,
+    isVerified: true,
+    avatar: "https://i.pravatar.cc/150?img=10"
+  },
+  {
+    _id: "c4",
+    name: "Chef Ranveer Brar",
+    bio: "Healthy Indian cooking expert",
+    cuisineSpecialties: ["Gujarati", "Indian"],
+    rating: 4.9,
+    totalReviews: 120,
+    experience: 8,
+    isVerified: true,
+    avatar: "https://i.pravatar.cc/150?img=10"
+  },
+  {
+    _id: "c5",
+    name: "Chef Sanjeev Kapoor",
+    bio: "Healthy Indian cooking expert",
+    cuisineSpecialties: ["Gujarati", "Indian"],
+    rating: 4.9,
+    totalReviews: 120,
+    experience: 8,
+    isVerified: true,
+    avatar: "https://i.pravatar.cc/150?img=10"
   }
 ];
 
@@ -124,4 +168,3 @@ exports.getChefReviews = async (req, res) => {
     });
   }
 };
-
