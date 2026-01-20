@@ -49,56 +49,74 @@ const ExploreChefs = () => {
             <p className="text-gray-600 text-lg">No chefs available yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {chefs.map((chef) => (
               <Link
                 key={chef._id}
                 to={`/chefs/${chef._id}`}
-                className="card hover:scale-[1.02] transition-transform"
+                className="group relative bg-white rounded-3xl overflow-hidden shadow-soft hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border border-gray-100/50"
               >
-                <div className="flex items-start space-x-4 mb-4">
-                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    {chef.avatar ? (
-                      <img src={chef.avatar} alt={chef.name} className="w-16 h-16 rounded-full object-cover" />
-                    ) : (
-                      <FiUser className="text-primary-600 text-2xl" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <h3 className="text-xl font-display font-semibold text-primary-800">
-                        {chef.name}
-                      </h3>
-                      {chef.isVerified && (
-                        <FiCheckCircle className="text-primary-600" title="Verified Chef" />
+                {/* Card Background / Cover */}
+                <div className="h-32 bg-gradient-to-r from-primary-600 to-primary-400 relative">
+                  <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                </div>
+
+                <div className="px-6 pb-8 text-center -mt-16 relative z-10">
+                  {/* Avatar */}
+                  <div className="relative w-32 h-32 mx-auto mb-4 p-1 bg-white rounded-full shadow-lg">
+                    <div className="w-full h-full rounded-full overflow-hidden border-2 border-gray-50">
+                      {chef.avatar ? (
+                        <img src={chef.avatar} alt={chef.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      ) : (
+                        <div className="w-full h-full bg-primary-50 flex items-center justify-center">
+                          <FiUser className="text-primary-600 text-4xl" />
+                        </div>
                       )}
                     </div>
-                    {chef.rating > 0 && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <FiStar className="text-accent-500 mr-1" />
-                        <span>{chef.rating.toFixed(1)}</span>
-                        <span className="ml-1">({chef.totalReviews} reviews)</span>
+                    {chef.isVerified && (
+                      <div className="absolute bottom-2 right-2 bg-primary-600 text-white p-1.5 rounded-full border-2 border-white shadow-md">
+                        <FiCheckCircle className="text-sm" />
                       </div>
                     )}
                   </div>
-                </div>
-                {chef.bio && (
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {chef.bio}
-                  </p>
-                )}
-                {chef.cuisineSpecialties && chef.cuisineSpecialties.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {chef.cuisineSpecialties.slice(0, 3).map((cuisine, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium"
-                      >
-                        {cuisine}
-                      </span>
-                    ))}
+
+                  {/* Info */}
+                  <h3 className="text-2xl font-display font-bold text-primary-800 mb-1 group-hover:text-primary-600 transition-colors">
+                    {chef.name}
+                  </h3>
+                  
+                  {chef.rating > 0 && (
+                    <div className="flex items-center justify-center text-sm font-bold text-accent-600 mb-4 bg-accent-50 w-fit mx-auto px-3 py-1 rounded-full">
+                      <FiStar className="mr-1 fill-current" />
+                      <span>{chef.rating.toFixed(1)}</span>
+                      <span className="text-accent-400 ml-1 font-medium">({chef.totalReviews} reviews)</span>
+                    </div>
+                  )}
+
+                  {chef.bio && (
+                    <p className="text-gray-600 text-sm mb-6 line-clamp-2 leading-relaxed italic">
+                      "{chef.bio}"
+                    </p>
+                  )}
+
+                  {chef.cuisineSpecialties && chef.cuisineSpecialties.length > 0 && (
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {chef.cuisineSpecialties.slice(0, 3).map((cuisine, idx) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-[10px] font-bold uppercase tracking-wider border border-primary-100"
+                        >
+                          {cuisine}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="mt-8 pt-6 border-t border-gray-50 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    <span>{chef.experience || '10+'}+ Yrs Exp</span>
+                    <span className="text-primary-600">View Profile →</span>
                   </div>
-                )}
+                </div>
               </Link>
             ))}
           </div>
